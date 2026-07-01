@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  OWNER
+  TENANT
+}
+
+enum ListingStatus {
+  ACTIVE
+  FILLED
+}
+
+enum RoomType {
+  PRIVATE
+  SHARED
+}
+
+enum FurnishedStatus {
+  FURNISHED
+  SEMI_FURNISHED
+  UNFURNISHED
+}
+
+enum InterestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+enum ScoreSource {
+  LLM
+  FALLBACK
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+
+  listings        Listing[]
+  profile         TenantProfile?
+  compatibilities Compatibility[]
+  interests       Interest[]
+  messages        Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Listing {
+  id            String @id @default(cuid())
+
+  title         String
+  description   String
+
+  location    String
+  rent          Int
+
+  roomType      RoomType
+  furnished     FurnishedStatus
+
+  availableFrom DateTime
+
+  isAvailable Boolean @default(true)
+  status        ListingStatus @default(ACTIVE)
+
+  ownerId       String
+  owner         User @relation(fields: [ownerId], references: [id])
+
+  compatibilities Compatibility[]
+  interests       Interest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TenantProfile {
+  id                String @id @default(cuid())
+
+  preferredLocation   String
+
+  budgetMin         Int
+  budgetMax         Int
+
+  moveInDate        DateTime
+
+  tenantId          String @unique
+  tenant            User @relation(fields: [tenantId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Compatibility {
+  id          String @id @default(cuid())
+
+  tenantId    String
+  listingId   String
+
+  score       Int
+  explanation String
+
+  source      ScoreSource
+
+  tenant      User @relation(fields: [tenantId], references: [id])
+  listing     Listing @relation(fields: [listingId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([tenantId, listingId])
+}
+
+model Interest {
+  id         String @id @default(cuid())
+
+  tenantId   String
+  listingId  String
+
+  status     InterestStatus @default(PENDING)
+
+  tenant     User @relation(fields: [tenantId], references: [id])
+  listing    Listing @relation(fields: [listingId], references: [id])
+
+  conversation Conversation?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Conversation {
+  id         String @id @default(cuid())
+
+  interestId String @unique
+
+  interest   Interest @relation(fields: [interestId], references: [id])
+
+  messages   Message[]
+
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id             String @id @default(cuid())
+
+  conversationId String
+  senderId       String
+
+  content        String
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+  sender         User @relation(fields: [senderId], references: [id])
+
+  createdAt DateTime @default(now())
+}
