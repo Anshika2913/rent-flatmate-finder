@@ -63,3 +63,28 @@ export const getListingById = async (id) => {
     },
   });
 };
+
+export const updateListing = async (id, listingData) => {
+  return await prisma.listing.update({
+    where: { id },
+    data: listingData,
+  });
+};
+
+export const findListingById = async (id) => {
+  return await prisma.listing.findUnique({
+    where: { id },
+  });
+};
+
+export const markListingFilled = async (id) => {
+  return await prisma.listing.update({
+    where: {
+      id,
+    },
+    data: {
+      status: "FILLED",
+      isAvailable: false,
+    },
+  });
+};
