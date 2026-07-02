@@ -1,17 +1,13 @@
 import prisma from "../config/prisma.js";
 import { hashPassword } from "../utils/hash.js";
 
-export const registerUser = async (userData) => {
-  const { name, email, password, role } = userData;
-
+export const registerUser = async ({ name, email, password, role }) => {
   const existingUser = await prisma.user.findUnique({
-    where: {
-      email,
-    },
+    where: { email },
   });
 
   if (existingUser) {
-    throw new Error("Email already registered.");
+    throw new Error("Email already exists");
   }
 
   const hashedPassword = await hashPassword(password);
@@ -25,5 +21,10 @@ export const registerUser = async (userData) => {
     },
   });
 
-  return user;
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
 };
