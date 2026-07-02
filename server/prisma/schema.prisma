@@ -7,6 +7,98 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id              String          @id @default(cuid())
+  name            String
+  email           String          @unique
+  password        String
+  role            Role
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  compatibilities Compatibility[]
+  interests       Interest[]
+  listings        Listing[]
+  messages        Message[]
+  profile         TenantProfile?
+}
+
+model Listing {
+  id              String          @id @default(cuid())
+  title           String
+  description     String
+  rent            Int
+  roomType        RoomType
+  furnished       FurnishedStatus
+  availableFrom   DateTime
+  isAvailable     Boolean         @default(true)
+  status          ListingStatus   @default(ACTIVE)
+  ownerId         String
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  city            String
+  state           String
+  compatibilities Compatibility[]
+  interests       Interest[]
+  owner           User            @relation(fields: [ownerId], references: [id])
+}
+
+model TenantProfile {
+  id             String   @id @default(cuid())
+  budgetMin      Int
+  budgetMax      Int
+  moveInDate     DateTime
+  tenantId       String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  preferredCity  String
+  preferredState String
+  tenant         User     @relation(fields: [tenantId], references: [id])
+}
+
+model Compatibility {
+  id          String      @id @default(cuid())
+  tenantId    String
+  listingId   String
+  score       Int
+  explanation String
+  source      ScoreSource
+  createdAt   DateTime    @default(now())
+  listing     Listing     @relation(fields: [listingId], references: [id])
+  tenant      User        @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, listingId])
+}
+
+model Interest {
+  id           String         @id @default(cuid())
+  tenantId     String
+  listingId    String
+  status       InterestStatus @default(PENDING)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  conversation Conversation?
+  listing      Listing        @relation(fields: [listingId], references: [id])
+  tenant       User           @relation(fields: [tenantId], references: [id])
+}
+
+model Conversation {
+  id         String    @id @default(cuid())
+  interestId String    @unique
+  createdAt  DateTime  @default(now())
+  interest   Interest  @relation(fields: [interestId], references: [id])
+  messages   Message[]
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  sender         User         @relation(fields: [senderId], references: [id])
+}
+
 enum Role {
   ADMIN
   OWNER
@@ -38,128 +130,4 @@ enum InterestStatus {
 enum ScoreSource {
   LLM
   FALLBACK
-}
-
-model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role
-
-  listings        Listing[]
-  profile         TenantProfile?
-  compatibilities Compatibility[]
-  interests       Interest[]
-  messages        Message[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Listing {
-  id            String @id @default(cuid())
-
-  title         String
-  description   String
-
-  location    String
-  rent          Int
-
-  roomType      RoomType
-  furnished     FurnishedStatus
-
-  availableFrom DateTime
-
-  isAvailable Boolean @default(true)
-  status        ListingStatus @default(ACTIVE)
-
-  ownerId       String
-  owner         User @relation(fields: [ownerId], references: [id])
-
-  compatibilities Compatibility[]
-  interests       Interest[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model TenantProfile {
-  id                String @id @default(cuid())
-
-  preferredLocation   String
-
-  budgetMin         Int
-  budgetMax         Int
-
-  moveInDate        DateTime
-
-  tenantId          String @unique
-  tenant            User @relation(fields: [tenantId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Compatibility {
-  id          String @id @default(cuid())
-
-  tenantId    String
-  listingId   String
-
-  score       Int
-  explanation String
-
-  source      ScoreSource
-
-  tenant      User @relation(fields: [tenantId], references: [id])
-  listing     Listing @relation(fields: [listingId], references: [id])
-
-  createdAt DateTime @default(now())
-
-  @@unique([tenantId, listingId])
-}
-
-model Interest {
-  id         String @id @default(cuid())
-
-  tenantId   String
-  listingId  String
-
-  status     InterestStatus @default(PENDING)
-
-  tenant     User @relation(fields: [tenantId], references: [id])
-  listing    Listing @relation(fields: [listingId], references: [id])
-
-  conversation Conversation?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Conversation {
-  id         String @id @default(cuid())
-
-  interestId String @unique
-
-  interest   Interest @relation(fields: [interestId], references: [id])
-
-  messages   Message[]
-
-  createdAt DateTime @default(now())
-}
-
-model Message {
-  id             String @id @default(cuid())
-
-  conversationId String
-  senderId       String
-
-  content        String
-
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
-
-  sender         User @relation(fields: [senderId], references: [id])
-
-  createdAt DateTime @default(now())
 }
