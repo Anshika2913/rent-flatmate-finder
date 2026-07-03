@@ -1,7 +1,5 @@
-import {
-  sendMessage,
-  getMessages,
-} from "../services/message.service.js";
+import {sendMessage, getMessages} from "../services/message.service.js";
+import { getIO } from "../socket/socket.js";
 
 export const create = async (req, res) => {
   try {
@@ -10,6 +8,10 @@ export const create = async (req, res) => {
       req.user.id,
       req.body.content
     );
+
+    const io = getIO();
+
+    io.to(req.params.conversationId).emit("newMessage", message);
 
     return res.status(201).json({
       success: true,
