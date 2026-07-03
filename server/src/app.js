@@ -5,6 +5,8 @@ import listingRoutes from "./routes/listing.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
 import interestRoutes from "./routes/interest.routes.js";
 import compatibilityRoutes from "./routes/compatibility.routes.js";
+import conversationRoutes from "./routes/conversation.routes.js";
+import messageRoutes from "./routes/message.routes.js";
 
 const app = express();
 
@@ -25,5 +27,7 @@ app.use("/api/listings", listingRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/interests", interestRoutes);
 app.use("/api/compatibility", compatibilityRoutes);
+app.use("/api/conversations", conversationRoutes);
+app.use("/api/messages", messageRoutes);
 
 export default app;
