@@ -2,6 +2,8 @@ import { Routes, Route } from "react-router-dom";
 
 import Login from "../pages/auth/Login";
 import OwnerDashboard from "../pages/owner/OwnerDashboard";
+import TenantDashboard from "../pages/tenant/TenantDashboard";
+
 
 import MyListings from "../pages/owner/MyListings";
 import ProtectedRoute from "./ProtectedRoute";
@@ -9,11 +11,11 @@ import CreateListing from "../pages/owner/CreateListing";
 import EditListing from "../pages/owner/EditListing";
 import Interests from "../pages/owner/Interests";
 import Chats from "../pages/owner/Chats";
-import Chat from "../pages/shared/Chat";
 
-function TenantDashboard() {
-  return <h1>Tenant Dashboard</h1>;
-}
+import Chat from "../pages/shared/Chat";
+import ListingDetails from "../pages/tenant/ListingDetails";
+import MyInterests from "../pages/tenant/MyInterests";
+import TenantChats from "../pages/tenant/TenantChats";
 
 function AppRoutes() {
   return (
@@ -87,6 +89,33 @@ function AppRoutes() {
         element={
             <ProtectedRoute>
             <Chat />
+            </ProtectedRoute>
+        }
+        />
+
+        <Route
+        path="/tenant/listing/:id"
+        element={
+            <ProtectedRoute role="TENANT">
+            <ListingDetails />
+            </ProtectedRoute>
+        }
+        />
+
+        <Route
+        path="/tenant/interests"
+        element={
+            <ProtectedRoute role="TENANT">
+            <MyInterests />
+            </ProtectedRoute>
+        }
+        />
+
+        <Route
+        path="/tenant/chats"
+        element={
+            <ProtectedRoute role="TENANT">
+            <TenantChats />
             </ProtectedRoute>
         }
         />

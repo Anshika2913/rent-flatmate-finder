@@ -1,5 +1,10 @@
 import api from "./api";
 
+export const getAllListings = async () => {
+  const { data } = await api.get("/listings");
+  return data;
+};
+
 export const getMyListings = async () => {
   const { data } = await api.get("/listings/my");
   return data;

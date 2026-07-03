@@ -93,3 +93,26 @@ export const createConversation = async (interestId) => {
     },
   });
 };
+
+export const getSentInterests = async (tenantId) => {
+  return await prisma.interest.findMany({
+    where: {
+      tenantId,
+    },
+    include: {
+      listing: {
+        select: {
+          id: true,
+          title: true,
+          city: true,
+          state: true,
+          rent: true,
+        },
+      },
+      conversation: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};

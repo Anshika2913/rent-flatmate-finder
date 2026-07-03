@@ -1,5 +1,5 @@
 import { sendInterest, getReceivedInterests, findInterestById,
-  updateInterestStatus, createConversation } from "../services/interest.service.js";
+  updateInterestStatus, createConversation, getSentInterests } from "../services/interest.service.js";
 
 export const create = async (req, res) => {
   try {
@@ -92,3 +92,19 @@ export const accept = (req, res) =>
 
 export const decline = (req, res) =>
   changeStatus(req, res, "DECLINED");
+
+export const getSent = async (req, res) => {
+  try {
+    const interests = await getSentInterests(req.user.id);
+
+    return res.status(200).json({
+      success: true,
+      data: interests,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
