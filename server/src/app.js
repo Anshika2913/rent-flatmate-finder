@@ -4,6 +4,7 @@ import authRoutes from "./routes/auth.routes.js";
 import listingRoutes from "./routes/listing.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
 import interestRoutes from "./routes/interest.routes.js";
+import compatibilityRoutes from "./routes/compatibility.routes.js";
 
 const app = express();
 
@@ -23,5 +24,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/listings", listingRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/interests", interestRoutes);
+app.use("/api/compatibility", compatibilityRoutes);
 
 export default app;
