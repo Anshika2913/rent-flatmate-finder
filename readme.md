@@ -111,7 +111,7 @@ Main Models
 ## Clone Repository
 
 ```bash
-git clone https://github.com/Anshika29/rent-flatmate-finder.git
+git clone https://github.com/Anshika2913/rent-flatmate-finder.git
 
 cd rent-flatmate-finder
 ```
