@@ -5,6 +5,7 @@ export const createListing = async (listingData, ownerId) => {
     data: {
       ...listingData,
       ownerId,   //logged in user id
+      availableFrom: new Date(listingData.availableFrom),
     },
   });
 
@@ -39,6 +40,18 @@ export const getAllListings = async (filters) => {
           name: true,
         },
       },
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
+export const getOwnerListings = async (ownerId) => {
+  return await prisma.listing.findMany({
+    where: {
+      ownerId,
     },
 
     orderBy: {

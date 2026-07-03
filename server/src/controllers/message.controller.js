@@ -1,45 +1,72 @@
-import {sendMessage, getMessages} from "../services/message.service.js";
-import { getIO } from "../socket/socket.js";
+import {
+  getMessages,
+  sendMessage,
+  getOwnerConversations,
+  getTenantConversations,
+} from "../services/message.service.js";
 
-export const create = async (req, res) => {
+export const getConversationMessages = async (req, res) => {
   try {
-    const message = await sendMessage(
-      req.params.conversationId,
-      req.user.id,
-      req.body.content
-    );
+    const messages = await getMessages(req.params.id);
 
-    const io = getIO();
-
-    io.to(req.params.conversationId).emit("newMessage", message);
-
-    return res.status(201).json({
+    res.json({
       success: true,
-      message: "Message sent successfully",
-      data: message,
+      data: messages,
     });
   } catch (error) {
-    return res.status(400).json({
+    res.status(500).json({
       success: false,
       message: error.message,
     });
   }
 };
 
-export const getAll = async (req, res) => {
+export const createMessage = async (req, res) => {
   try {
-    const messages = await getMessages(
-      req.params.conversationId,
-      req.user.id
+    const message = await sendMessage(
+      req.params.id,
+      req.user.id,
+      req.body.content
     );
 
-    return res.status(200).json({
+    res.status(201).json({
       success: true,
-      count: messages.length,
-      data: messages,
+      data: message,
     });
   } catch (error) {
-    return res.status(400).json({
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const ownerConversations = async (req, res) => {
+  try {
+    const conversations = await getOwnerConversations(req.user.id);
+
+    res.json({
+      success: true,
+      data: conversations,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const tenantConversations = async (req, res) => {
+  try {
+    const conversations = await getTenantConversations(req.user.id);
+
+    res.json({
+      success: true,
+      data: conversations,
+    });
+  } catch (error) {
+    res.status(500).json({
       success: false,
       message: error.message,
     });

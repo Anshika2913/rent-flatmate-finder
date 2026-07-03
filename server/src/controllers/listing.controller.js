@@ -1,4 +1,10 @@
-import { createListing, getAllListings,  getListingById, updateListing, findListingById, markListingFilled} from "../services/listing.service.js";
+import {  createListing,
+  getAllListings,
+  getOwnerListings,
+  getListingById,
+  updateListing,
+  findListingById,
+  markListingFilled} from "../services/listing.service.js";
 
 export const create = async (req, res) => {
   try {
@@ -21,6 +27,23 @@ export const create = async (req, res) => {
 export const getAll = async (req, res) => {
   try {
     const listings = await getAllListings(req.query);
+
+    return res.status(200).json({
+      success: true,
+      count: listings.length,
+      data: listings,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getMine = async (req, res) => {
+  try {
+    const listings = await getOwnerListings(req.user.id);
 
     return res.status(200).json({
       success: true,

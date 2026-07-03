@@ -1,23 +1,22 @@
 import express from "express";
+
 import {
-  create,
-  getAll,
+  getConversationMessages,
+  createMessage,
+  ownerConversations,
+  tenantConversations,
 } from "../controllers/message.controller.js";
 
 import { authenticate } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.post(
-  "/:conversationId",
-  authenticate,
-  create
-);
+router.get("/owner", authenticate, ownerConversations);
 
-router.get(
-  "/:conversationId",
-  authenticate,
-  getAll
-);
+router.get("/tenant", authenticate, tenantConversations);
+
+router.get("/:id", authenticate, getConversationMessages);
+
+router.post("/:id", authenticate, createMessage);
 
 export default router;
